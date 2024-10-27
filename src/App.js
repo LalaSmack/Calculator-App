@@ -22,15 +22,52 @@ function reducer (state, {type, payload}) {
       }
     case ACTIONS.CHOOSE_OPERATION:
         if (state.currentOperand == null && state.previousOperand == null) { return state }
+        
+        if (state.currentOperand == null) {
+          return {
+            ...state,
+            operation: payload.operation,
+          }
+        }
+
         if (state.previousOperand == null) {
           return {
             ...state,
             previousOperand: state.currentOperand,
-            operation: payload.operation
+            operation: payload.operation,
+            currentOperand: null,
           }
         }
+        return {
+            ...state,
+            previousOperand: evaluate(state),
+            currentOperand: null,
+            operation: payload.operation,
+          }
     case ACTIONS.CLEAR:
       return {}
+}
+
+function evaluate(state) {
+  const previous = parseFloat(state.previousOperand)
+  const current = parseFloat(state.currentOperand)
+  if (isNaN (previous) || isNaN(current)) return {}
+  let computation = ""
+  switch (state.operation) {
+    case "+":
+      computation = previous + current
+      break
+    case "-":
+      computation = previous - current
+      break
+    case "*":
+      computation = previous * current
+      break
+    case "÷":
+      computation = previous / current
+      break
+  }
+  return computation.toString()
 }
 }
 function App() {
